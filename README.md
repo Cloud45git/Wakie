@@ -1,5 +1,4 @@
 <img width="100" height="120" alt="IMG_1424" src="https://github.com/user-attachments/assets/0bb80dc7-7941-47b6-a0d6-28149cad77a5" />
-**Wakie**
 
 By Team Unity.X (Sheenam, Madhu, Claudia, Saba, and Tushar)
 
@@ -15,4 +14,5 @@ The Challenges:
 
 * **Blah Blah:** You have to talk for 30 seconds straight. We record your sleepy morning rambles and save them for you to listen to later.
 
-<img width="1068" height="556" alt="image" src="https://github.com/user-attachments/assets/a004fa0e-ef2a-4337-9906-8446b79f60e7" />
+<img width="1061" height="575" alt="image" src="https://github.com/user-attachments/assets/9341b75c-6198-45f3-ba3f-d2a93adfccff" />
+
