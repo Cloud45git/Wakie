@@ -11,8 +11,21 @@
     ],
   },
   "files": [
-    { "kind": "folder", "path": "Wakie", "target-membership": [ "Wakie" ] },
     {
+      "kind": "folder",
+      "path": "Wakie",
+      "target-membership": [
+        "Wakie",
+      ],
+      "membership-exceptions": [
+        {
+          "target": "Wakie",
+          "exclusions": [
+            "Info.plist",
+          ],
+        },
+      ],
+    }, {
       "kind": "group",
       "name": "Products",
       "children": [
@@ -39,11 +52,14 @@
         "DEVELOPMENT_TEAM": "ZADUBHJ8Y3",
         "ENABLE_PREVIEWS": "YES",
         "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_FILE": "Wakie/Info.plist",
+        "INFOPLIST_KEY_NSCameraUsageDescription": "Wakie uses the camera to see you dance in Shaky-Shaky and to spot the item you find in Pickie-Picky.",
+        "INFOPLIST_KEY_NSMicrophoneUsageDescription": "Wakie records you talking during Blah-Blah and saves the recording for you.",
         "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES",
         "INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents": "YES",
         "INFOPLIST_KEY_UILaunchScreen_Generation": "YES",
         "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
-        "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
+        "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone": "UIInterfaceOrientationPortrait",
         "LD_RUNPATH_SEARCH_PATHS": [
           "$(inherited)",
           "@executable_path/Frameworks",
@@ -57,7 +73,7 @@
         "SWIFT_EMIT_LOC_STRINGS": "YES",
         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
         "SWIFT_VERSION": "5.0",
-        "TARGETED_DEVICE_FAMILY": "1,2",
+        "TARGETED_DEVICE_FAMILY": "1",
       },
     },
   ],
