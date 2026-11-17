@@ -143,6 +143,20 @@ final class AppModel {
     }
 
     func save(_ alarm: WakieAlarm) {
+        let alarm = store(alarm)
+        Task { await register(alarm) }
+    }
+
+    /// Saves and waits until the system has the alarm. Used by Siri so it can report back.
+    /// Returns `false` if Wakie isn't allowed to schedule alarms.
+    @discardableResult
+    func saveAndSchedule(_ alarm: WakieAlarm) async -> Bool {
+        let alarm = store(alarm)
+        await register(alarm)
+        return !alarmsDenied
+    }
+
+    private func store(_ alarm: WakieAlarm) -> WakieAlarm {
         var alarm = alarm
         alarm.isEnabled = true
         alarm.oneShotFireDate = alarm.isRepeating ? nil : alarm.nextFireDate()
@@ -151,7 +165,7 @@ final class AppModel {
         } else {
             alarms.append(alarm)
         }
-        Task { await register(alarm) }
+        return alarm
     }
 
     func delete(_ id: UUID) {

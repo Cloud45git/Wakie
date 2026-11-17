@@ -19,9 +19,17 @@ final class DanceTracker {
 
     private var previous: PoseFrame?
     private var energy: Double = 0
+    /// When the person last moved enough to count as dancing.
+    private var lastMovementTime: TimeInterval?
 
-    /// Average joint speed (in body-heights per second) needed to count as dancing.
-    private let movementThreshold = 0.35
+    /// Speed (in body-heights per second) of the fastest-moving joints needed to count as dancing.
+    private let movementThreshold = 0.25
+    /// Only the fastest few joints count, so moving just the arms (or just the hips) is enough.
+    private let activeJointCount = 3
+    /// Per-frame joint moves smaller than this (in body heights) are tracking jitter, not dancing.
+    private let jitterTolerance = 0.012
+    /// How long the timer keeps running through a pause in the dance.
+    private let pauseGrace: TimeInterval = 1.5
 
     init(target: Double) {
         self.target = target
@@ -32,6 +40,7 @@ final class DanceTracker {
         previous = nil
         frame = nil
         energy = 0
+        lastMovementTime = nil
         isMoving = false
     }
 
@@ -43,30 +52,43 @@ final class DanceTracker {
             frame = newFrame
             previous = newFrame
         }
+        let dt = min(max(newFrame.time - (previous?.time ?? newFrame.time), 0.01), 0.3)
         guard newFrame.joints.count >= 6, let previous, previous.joints.count >= 6 else {
+            // Tracking dropped for a moment: keep the timer going through the grace period.
             energy *= 0.5
-            isMoving = false
+            updateMoving(movedNow: false, at: newFrame.time, dt: dt)
             return
         }
-        let dt = min(max(newFrame.time - previous.time, 0.01), 0.3)
         let w = newFrame.imageSize.width, h = newFrame.imageSize.height
 
         // Body height in pixels normalises for how far the person stands from the phone.
         let ys = newFrame.joints.values.map { $0.y * h }
         let bodyHeight = max((ys.max() ?? 0) - (ys.min() ?? 0), h * 0.15)
 
-        var travelled = 0.0
-        var count = 0
+        // Each joint's move this frame, in body heights, ignoring tiny tracking jitter.
+        var moves: [Double] = []
         for (joint, point) in newFrame.joints {
             guard let old = previous.joints[joint] else { continue }
-            travelled += hypot((point.x - old.x) * w, (point.y - old.y) * h)
-            count += 1
+            let move = hypot((point.x - old.x) * w, (point.y - old.y) * h) / bodyHeight
+            moves.append(move > jitterTolerance ? move : 0)
         }
-        guard count >= 4 else { return }
+        guard moves.count >= 4 else { return }
 
-        let speed = travelled / Double(count) / bodyHeight / dt
+        // Average only the fastest joints, so moving part of the body still counts.
+        let fastest = moves.sorted(by: >).prefix(activeJointCount)
+        let speed = fastest.reduce(0, +) / Double(fastest.count) / dt
         energy = energy * 0.6 + speed * 0.4
-        isMoving = energy > movementThreshold
+        updateMoving(movedNow: energy > movementThreshold, at: newFrame.time, dt: dt)
+    }
+
+    /// Counts the frame as dancing if the person is moving now or paused only briefly.
+    private func updateMoving(movedNow: Bool, at time: TimeInterval, dt: Double) {
+        if movedNow { lastMovementTime = time }
+        if let lastMovementTime {
+            isMoving = time - lastMovementTime <= pauseGrace
+        } else {
+            isMoving = false
+        }
         if isRunning && isMoving {
             seconds = min(target, seconds + dt)
         }

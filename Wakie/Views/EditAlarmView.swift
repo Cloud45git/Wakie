@@ -144,20 +144,21 @@ struct EditAlarmView: View {
 
     /// Card below Snooze for choosing which place's clock the alarm follows.
     private var timeZoneCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text("Time zone")
                     .font(.wakie(16, .bold))
                     .foregroundStyle(Theme.ink)
-                Spacer()
-                zonePicker
+                Text(composedAlarm.isLocal
+                     ? "Uses your phone's time."
+                     : "Rings at \(composedAlarm.localTimeText()) your time.")
+                    .font(.wakie(12, .semibold))
+                    .foregroundStyle(Theme.inkSecondary)
+                    .contentTransition(.opacity)
             }
-            Text(composedAlarm.isLocal
-                 ? "Uses your phone's time."
-                 : "Rings at \(composedAlarm.localTimeText()) your time.")
-                .font(.wakie(12, .semibold))
-                .foregroundStyle(Theme.inkSecondary)
-                .contentTransition(.opacity)
+            Spacer(minLength: 8)
+            // Centred vertically against both lines of text.
+            zonePicker
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
@@ -183,10 +184,10 @@ struct EditAlarmView: View {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 10, weight: .black))
             }
-            .font(.wakie(14, .bold))
+            .font(.wakie(15, .bold))
             .foregroundStyle(Theme.ink)
-            .padding(.horizontal, 14)
-            .frame(height: 34)
+            .padding(.horizontal, 16)
+            .frame(height: 46)
             .background(Capsule().fill(Theme.lavenderPill))
         }
         .accessibilityLabel("Alarm time zone, \(draft.placeLabel)")

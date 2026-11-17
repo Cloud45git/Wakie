@@ -33,6 +33,24 @@ nonisolated enum AudioSessionControl {
         return player
     }
 
+    /// Activates a record session, then creates the recorder and starts recording,
+    /// all off the main thread (starting a recording can activate the session itself).
+    @concurrent
+    static func startRecorder(url: URL) async throws -> sending AVAudioRecorder {
+        try await activate(.playAndRecord, options: [.defaultToSpeaker])
+        let recorder = try AVAudioRecorder(url: url, settings: [
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+            AVSampleRateKey: 44_100,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+        ])
+        recorder.isMeteringEnabled = true
+        guard recorder.prepareToRecord(), recorder.record() else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+        return recorder
+    }
+
     @concurrent
     static func deactivate() async {
         _ = try? await AVAudioSession.sharedInstance().deactivate()

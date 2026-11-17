@@ -117,12 +117,13 @@ struct SettingsView: View {
                         Text(model.danceSongFile == nil ? "Choose" : "Change")
                             .font(.wakie(13, .bold))
                             .foregroundStyle(Theme.ink)
-                            .padding(.horizontal, 12)
-                            .frame(height: 32)
-                            .background(Capsule().fill(Theme.lavenderPill))
+                            .padding(.horizontal, 14)
+                            .frame(height: 36)
+                            .contentShape(Capsule())
                     }
                 }
                 .buttonStyle(.plain)
+                .glassEffect(.regular.tint(Theme.purple.opacity(0.25)).interactive(), in: .capsule)
                 .disabled(isImportingSong)
             }
             .padding(.horizontal, 12)

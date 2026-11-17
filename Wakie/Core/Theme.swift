@@ -116,12 +116,18 @@ struct StarField: View {
             seed = seed &* 6364136223846793005 &+ 1442695040888963407
             return Double(seed >> 33) / Double(1 << 31)
         }
-        return (0..<70).map { index in
+        return (0..<90).compactMap { index -> Star? in
             let sparkle = index % 9 == 0
+            let x = next()
+            // Denser toward the top of the screen, thinning out near the hills.
+            let y = pow(next(), 1.4) * 0.85
+            // Leave the title area (top-left, where every tab's heading sits) clear,
+            // and keep the bigger sparkles out of the top of the screen entirely.
+            if y < 0.16 && x < 0.75 { return nil }
+            if sparkle && y < 0.3 { return nil }
             return Star(
-                x: next(),
-                // Denser toward the top of the screen, thinning out near the hills.
-                y: pow(next(), 1.4) * 0.85,
+                x: x,
+                y: y,
                 radius: sparkle ? 4 + next() * 3 : 0.8 + next() * 2.2,
                 brightness: 0.45 + next() * 0.55,
                 speed: 0.6 + next() * 1.6,

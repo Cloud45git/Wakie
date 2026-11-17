@@ -107,19 +107,6 @@ struct EditableCityRow: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             CityCard(city: city, now: now)
-                .overlay(alignment: .trailing) {
-                    if isEditing {
-                        // Glass drag handle hinting that cards can be moved.
-                        Image(systemName: "line.3.horizontal")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 42, height: 42)
-                            .glassEffect(.regular.interactive(), in: .circle)
-                            .padding(.trailing, 14)
-                            .accessibilityHidden(true)
-                            .transition(.scale(scale: 0.3).combined(with: .opacity))
-                    }
-                }
                 // Make room for the badge inside this row's bounds while editing.
                 .padding(.top, isEditing ? 12 : 0)
                 .padding(.leading, isEditing ? 12 : 0)
@@ -264,8 +251,8 @@ struct FlightPath: View {
                 .stroke(Theme.ink.opacity(0.7), style: StrokeStyle(lineWidth: 2.5, lineCap: .round, dash: [6, 7]))
                 Image(systemName: "airplane")
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(Theme.ink)
-                    .rotationEffect(.degrees(-25))
+                    .foregroundStyle(Theme.ink.opacity(0.7))
+                    .rotationEffect(.degrees(-15))
                     .position(x: w * 0.9, y: h * 0.15)
             }
         }

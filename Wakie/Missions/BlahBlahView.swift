@@ -23,6 +23,8 @@ final class VoiceRecorder {
     @ObservationIgnored private var recorder: AVAudioRecorder?
     @ObservationIgnored private var meterTask: Task<Void, Never>?
     @ObservationIgnored private var fileURL: URL?
+    /// Set when the mission closes, including while the microphone is still starting.
+    @ObservationIgnored private var isCancelled = false
 
     /// Average power (dBFS) above which we treat the input as someone talking.
     private let speechThreshold: Float = -35
@@ -40,20 +42,14 @@ final class VoiceRecorder {
             return
         }
         do {
-            // Configured off the main thread with the async API, so the UI never stalls.
-            try await AudioSessionControl.activate(.playAndRecord, options: [.defaultToSpeaker])
-
             let stamp = Date.now.formatted(.iso8601.year().month().day().time(includingFractionalSeconds: false).timeSeparator(.omitted))
             let url = AppModel.recordingsDirectory.appending(path: "BlahBlah-\(stamp).m4a")
-            let recorder = try AVAudioRecorder(url: url, settings: [
-                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-                AVSampleRateKey: 44_100,
-                AVNumberOfChannelsKey: 1,
-                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
-            ])
-            recorder.isMeteringEnabled = true
-            guard recorder.record() else {
-                phase = .failed
+            // Session activation and starting the recorder both happen off the main thread.
+            let recorder = try await AudioSessionControl.startRecorder(url: url)
+            // The mission was closed while the microphone was starting up.
+            guard !isCancelled else {
+                recorder.stop()
+                try? FileManager.default.removeItem(at: url)
                 return
             }
             self.recorder = recorder
@@ -104,6 +100,7 @@ final class VoiceRecorder {
 
     /// Stops and throws away an unfinished recording.
     func cancel() {
+        isCancelled = true
         meterTask?.cancel()
         guard phase == .recording else { return }
         recorder?.stop()

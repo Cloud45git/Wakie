@@ -155,10 +155,15 @@ struct HomeView: View {
 
     private var challenges: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Challenges")
-                .font(.wakie(22, .heavy))
-                .foregroundStyle(Theme.ink)
-                .accessibilityAddTraits(.isHeader)
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("Challenges")
+                    .font(.wakie(22, .heavy))
+                    .foregroundStyle(Theme.ink)
+                    .accessibilityAddTraits(.isHeader)
+                Text("- Click to try it out")
+                    .font(.wakie(15, .semibold))
+                    .foregroundStyle(Theme.inkSecondary)
+            }
             ForEach(Array(Mission.allCases.enumerated()), id: \.element) { index, mission in
                 Button {
                     practice = MissionRun(mission: mission, isPractice: true)
